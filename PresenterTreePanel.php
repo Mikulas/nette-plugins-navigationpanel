@@ -73,18 +73,22 @@ class PresenterTreePanel extends /*Nette\*/Object implements /*Nette\*/IDebugPan
 					if (preg_match('/^(action|render)(.*)$/m', $action->getName(), $name) && !in_array($name[2], $actions)) {
 						$action_name = lcfirst($name[2]);
 						$pattern = '/Method \[.*? ' . $action . ' \].*? (?:Parameters .*? \{.*?Parameter #\d+ \[(.*?)\].*?\})? }/ms';
-						$set = FALSE;
+						$set_required = FALSE;
+						$set_optional = FALSE;
 						foreach ($action->getParameters() as $arg) {
-							if ($arg->isOptional()) {
-								$actions[$action_name]['arguments']['optional'][$arg->getName()] = $arg->getDefaultValue();
-							} else {
+							if (!$arg->isOptional()) {
 								$actions[$action_name]['arguments']['required'][$arg->getName()] = NULL;
+								$set_required = TRUE;
+							} else {
+								$actions[$action_name]['arguments']['optional'][$arg->getName()] = $arg->getDefaultValue();
+								$set_optional = TRUE;
 							}
-							$set = TRUE;
 						}
-						if (!$set) {
-							$actions[$action_name]['arguments']['optional'] = array();
+						if (!$set_required) {
 							$actions[$action_name]['arguments']['required'] = array();
+						}
+						if (!$set_optional) {
+							$actions[$action_name]['arguments']['optional'] = array();
 						}
 					}
 				}
