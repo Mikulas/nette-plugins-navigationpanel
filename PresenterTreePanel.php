@@ -5,22 +5,21 @@
  * @author Mikuláš Dítě
  * @license MIT
  *
- * @todo Add alll 5.3 namespaces
  * @todo Add phpDoc
  * @todo Add caching
  * @todo Fix link from ?module=bar&presenter=foo to ?presenter=bar:foo
  */
-class PresenterTreePanel extends Object implements IDebugPanel
+
+/*namespace Nette;*/
+class PresenterTreePanel extends /*Nette\*/Object implements /*Nette\*/IDebugPanel
 {
-	const PRESENTER_DIR = 'presenters';
     	/**
 	 * Renders HTML code for custom tab.
 	 * @return void
 	 */
 	function getTab()
 	{
-		return Environment::getApplication()->getPresenter()->backlink();
-		return $s;
+		return /*Nette\*/Environment::getApplication()->getPresenter()->backlink();
 	}
 
 	/**
@@ -30,7 +29,7 @@ class PresenterTreePanel extends Object implements IDebugPanel
 	function getPanel()
 	{
 		ob_start();
-		$template = new Template(dirname(__FILE__) . '/bar.presentertree.panel.phtml');
+		$template = new /*Nette\Templates\*/Template(dirname(__FILE__) . '/bar.presentertree.panel.phtml');
 		$template->links = $this->generate();
 		$template->render();
 		return ob_get_clean();
@@ -45,7 +44,11 @@ class PresenterTreePanel extends Object implements IDebugPanel
 		return __CLASS__;
 	}
 
-	public function generate()
+	/**
+	 * Iterates through all presenters and returns their actions with backlinks and arguments
+	 * @return array
+	 */
+	private function generate()
 	{
 		$links = array();
 		
@@ -68,28 +71,35 @@ class PresenterTreePanel extends Object implements IDebugPanel
 				$actions = array();
 				foreach ($reflection->getMethods() as $action) {
 					if (preg_match('/^(action|render)(.*)$/m', $action->getName(), $name) && !in_array($name[2], $actions)) {
+						$action_name = lcfirst($name[2]);
 						$pattern = '/Method \[.*? ' . $action . ' \].*? (?:Parameters .*? \{.*?Parameter #\d+ \[(.*?)\].*?\})? }/ms';
+						$set = FALSE;
 						foreach ($action->getParameters() as $arg) {
 							if ($arg->isOptional()) {
-								$actions[$name[2]]['arguments']['optional'][$arg->getName()] = $arg->getDefaultValue();
+								$actions[$action_name]['arguments']['optional'][$arg->getName()] = $arg->getDefaultValue();
 							} else {
-								$actions[$name[2]]['arguments']['required'][$arg->getName()] = NULL;
+								$actions[$action_name]['arguments']['required'][$arg->getName()] = NULL;
 							}
+							$set = TRUE;
+						}
+						if (!$set) {
+							$actions[$action_name]['arguments']['optional'] = array();
+							$actions[$action_name]['arguments']['required'] = array();
 						}
 					}
 				}
 				if (count($actions) == 0) {
-					$actions[] = 'Default';
+					$actions['Default']['arguments']['required'] = array();
+					$actions['Default']['arguments']['optional'] = array();
 				}
 				foreach ($actions as $action => $info) {
 					$label = $link . ':' . $action;
+					$links[$label]['location']['action'] = $action; //faster when before location.presenter
 					if ($modules !== false) {
-						$links[$label]['location']['modules'] = substr(implode(':', $modules), 1);
+						$links[$label]['location']['presenter'] = substr(implode('_', $modules), 1) . ':' . $presenter;
 					} else {
-						$links[$label]['location']['modules'] = NULL;
+						$links[$label]['location']['presenter'] = $presenter;
 					}
-					$links[$label]['location']['presenter'] = $presenter;
-					$links[$label]['location']['action'] = $action;
 					$links[$label]['arguments'] = $info['arguments'];
 				}
 			}
@@ -97,13 +107,17 @@ class PresenterTreePanel extends Object implements IDebugPanel
 		return $links;
 	}
 
+	/**
+	 * @param string $filename
+	 * @return array|string all modules given presenter file is under
+	 */
 	private function getPresenterModules($filename)
 	{
 		$modules = explode('_', $filename);
 		if (count($modules) === 1) {
 			return false;
 		} else {
-			unset($modules[count($modules) - 1]);
+			unset($modules[count($modules) - 1]); //remove presenter name
 			return $modules;
 		}
 	}
