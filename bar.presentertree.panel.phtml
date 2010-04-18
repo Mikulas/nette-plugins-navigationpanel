@@ -1,0 +1,86 @@
+<?php
+/*namespace Nette;*/
+if (!function_exists(/*Nette\*/'_netteRequestCb2')) {
+
+	function _netteRequestCb2($m)
+	{
+		return "$m[1]<a href='#' class='nette-toggler'>$m[2]($m[3]) " . '<abbr>&#x25ba;</abbr> </a><code class="nette-hidden">';
+	}
+}
+
+?>
+
+<h1>Presenter Tree</h1>
+
+<div class="nette-inner">
+
+<table id="__PresenterTree_Panel">
+	<thead>
+		<tr>
+			<th rowspan="2">Links</th>
+			<th colspan="2">Arguments</th>
+		</tr>
+		<tr>
+			<th>Required</th>
+			<th>Optional</th>
+		</tr>
+	</thead>
+	<tbody>
+		<?php foreach ($links as $label => $link): ?>
+			<tr>
+				<td>
+					<a href="<?php echo Environment::getVariable('baseUri') . '?' . http_build_query($link['location']) ?>"><?php echo $label?></a>
+				</td>
+				<td>
+					<?php $left = count($link['arguments']['required']) ?>
+					<?php foreach ($link['arguments']['required'] as $arg => $value): ?>
+						<span>
+							$<?php echo $arg ?>
+						</span>
+						<?php
+						if ($left != 1) {
+							echo ',';
+							$left--;
+						} ?>
+					<?php endforeach; ?>
+				</td>
+				<td>
+					<?php $left = count($link['arguments']['optional']) ?>
+					<?php foreach ($link['arguments']['optional'] as $arg => $value): ?>
+						<span>
+							$<?php echo $arg ?>
+						</span>
+						&nbsp;=&nbsp;
+						<span style="color: #408045; font-style: italic !important;">
+							<?php
+							if ($value === TRUE) {
+								echo 'TRUE';
+							} elseif ($value === FALSE) {
+								echo 'FALSE';
+							} elseif ($value === NULL) {
+								echo 'NULL';
+							} elseif (is_string($value)) {
+								echo '\'' . $value . '\'';
+							} else {
+								print_r($value);
+							}
+							?>
+						</span>
+						<?php
+						if ($left != 1) {
+							echo ',';
+							$left--;
+						} ?>
+					<?php endforeach; ?>
+				</td>
+			</tr>
+		<?php endforeach ?>
+	</tbody>
+</table>
+
+</div>
+
+<style>
+	#__PresenterTree_Panel {width: 100%;}
+	#__PresenterTree_Panel pre {display: inline;}
+</style>
