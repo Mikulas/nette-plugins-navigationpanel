@@ -1,26 +1,44 @@
 <?php
 /**
- * Description of PresenterDebugger
+ * PresenterTree panel for Nette 1.0+. Displays all presenters and their required and optional parameters.
  *
  * @author Mikuláš Dítě
  * @license MIT
- *
- * @todo Add phpDoc
- * @todo Add caching
- * @todo Fix link from ?module=bar&presenter=foo to ?presenter=bar:foo
  */
 
-/*namespace Nette;*/
-class PresenterTreePanel extends /*Nette\*/Object implements /*Nette\*/IDebugPanel
+/*
+use Nette\Templates\
+namespace Nette;
+*/
+class PresenterTreePanel extends Object implements IDebugPanel
 {
+	/**
+	 *
+	 * @throws NotImplementedException if other than TRUE
+	 */
+	const MODULES_DISABLED = TRUE;
+
+
+
+	public function __construct()
+	{
+		if (self::MODULES_DISABLED !== TRUE) {
+			throw new NotImplementedException();
+		}
+	}
+
+
+
     	/**
 	 * Renders HTML code for custom tab.
 	 * @return void
 	 */
 	function getTab()
 	{
-		return /*Nette\*/Environment::getApplication()->getPresenter()->backlink();
+		return Environment::getApplication()->getPresenter()->backlink();
 	}
+
+
 
 	/**
 	 * Renders HTML code for custom panel.
@@ -29,11 +47,13 @@ class PresenterTreePanel extends /*Nette\*/Object implements /*Nette\*/IDebugPan
 	function getPanel()
 	{
 		ob_start();
-		$template = new /*Nette\Templates\*/Template(dirname(__FILE__) . '/bar.presentertree.panel.phtml');
-		$template->links = $this->generate();
+		$template = new Template(dirname(__FILE__) . '/bar.presentertree.panel.phtml');
+		$template->tree = $this->generate();
 		$template->render();
-		return ob_get_clean();
+		return $cache['output'] = ob_get_clean();
 	}
+
+
 
 	/**
 	 * Returns panel ID.
@@ -43,6 +63,8 @@ class PresenterTreePanel extends /*Nette\*/Object implements /*Nette\*/IDebugPan
 	{
 		return __CLASS__;
 	}
+
+
 
 	/**
 	 * Iterates through all presenters and returns their actions with backlinks and arguments
@@ -58,7 +80,7 @@ class PresenterTreePanel extends /*Nette\*/Object implements /*Nette\*/IDebugPan
 			
 			$reflection = new ReflectionClass($fileinfo['filename']);
 			if ($reflection->isInstantiable()) {
-				$modules = $this->getPresenterModules($fileinfo['filename']);
+				$modules = $this->getPresenterModules($reflection->name);
 				$link = '';
 				if ($modules !== FALSE) {
 					$link .= implode(':', $modules);
@@ -98,19 +120,112 @@ class PresenterTreePanel extends /*Nette\*/Object implements /*Nette\*/IDebugPan
 				}
 				foreach ($actions as $action => $info) {
 					$label = $link . ':' . $action;
-					$links[$label]['location']['action'] = $action; //faster when before location.presenter
-					if ($modules !== false) {
-						$links[$label]['location']['presenter'] = substr(implode('_', $modules), 1) . ':' . $presenter;
+
+					if (Environment::getApplication()->getPresenter() instanceof Presenter) {
+						$links[$label]['link'] = Environment::getApplication()->getPresenter()->link($label);
 					} else {
-						$links[$label]['location']['presenter'] = $presenter;
+						$links[$label]['link'] = 'false';
 					}
+
+					$links[$label]['action'] = $action;
+					$links[$label]['presenter'] = $presenter;
+					$links[$label]['modules'] = $modules;
 					$links[$label]['arguments'] = $info['arguments'];
 				}
 			}
 		}
-		return $links;
+		return $this->categorize($links);
 	}
 
+
+
+	/**
+	 * @param array $links
+	 * @return array
+	 */
+	private function categorize(array $links) {
+		$tree = array();
+		foreach($links as $link) {
+			$action = array($link['action'] => array('__link' => $link['link'], '__arguments' => $link['arguments']));
+
+			if ($link['modules'] === FALSE) {
+				if (!isset($tree[$link['presenter']])) {
+					$tree[$link['presenter']] = $action;
+				} else {
+					$tree[$link['presenter']] = array_merge_recursive($tree[$link['presenter']], $action);
+				}
+			} elseif (self::MODULES_DISABLED) {
+				$link['presenter'] = implode(':', $link['modules']) . ':' . $link['presenter'];
+				if (!isset($tree[$link['presenter']])) {
+					$tree[$link['presenter']] = $action;
+				} else {
+					$tree[$link['presenter']] = array_merge_recursive($tree[$link['presenter']], $action);
+				}
+			} else {
+				$tree = array_merge_recursive($this->array_hierarchy($link['modules']), $tree);
+				$this->array_keysFromArray($tree, $link['modules'], array($link['presenter'] => $action));
+			}
+		}
+		return $tree;
+	}
+
+
+
+	/**
+	 * Returns array with all nodes as child of previous one
+	 * array(1, 2, 3) => array(1 => array(2 => array(3 => array())))
+	 * @param array $array
+	 * @return array
+	 */
+	private function array_hierarchy(array $array)
+	{
+		$key = $array[0];
+		unset($array[0]);
+		sort($array);
+		$hierarchy = array();
+		if (is_array($array) && isset($array[0])) {
+			$hierarchy[$key] = $this->array_hierarchy($array);
+		} else {
+			$hierarchy[$key] = array();
+		}
+		return $hierarchy;
+	}
+
+
+
+	/**
+	 * Access array with keys stored in array
+	 * @example
+	 *	* $array = ('one' => array('two' => 'value'))
+	 *	* $keys = ('one', 'two')]
+	 *	* would return 'value' from $array
+	 * @param array $array
+	 * @param arary $keys
+	 * @param mixed $value
+	 * @param bool $append
+	 * @return array
+	 */
+	private function array_keysFromArray(&$array, $keys, $value = NULL, $append = TRUE)
+	{
+		$key = $keys[0];
+		unset($keys[0]);
+		sort($keys);
+		if (isset($keys[0]) && is_array($array[$key])) {
+			return $this->array_keysFromArray($array[$key], $keys, $value, $append);
+		} else {
+			if ($value !== NULL) {
+				if ($append) {
+					$array[$key] = array_merge_recursive($array[$key], $value);
+				} else {
+					$array[$key] = $value;
+				}
+			}
+			return $array[$key];
+		}
+	}
+
+
+	
 	/**
 	 * @param string $filename
 	 * @return array|string all modules given presenter file is under

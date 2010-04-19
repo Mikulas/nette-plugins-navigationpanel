@@ -1,7 +1,6 @@
 <?php
 /*namespace Nette;*/
-if (!function_exists(/*Nette\*/'_netteRequestCb2')) {
-
+if (!function_exists('_netteRequestCb2')) {
 	function _netteRequestCb2($m)
 	{
 		return "$m[1]<a href='#' class='nette-toggler'>$m[2]($m[3]) " . '<abbr>&#x25ba;</abbr> </a><code class="nette-hidden">';
@@ -9,73 +8,89 @@ if (!function_exists(/*Nette\*/'_netteRequestCb2')) {
 }
 
 ?>
-
 <h1>Presenter Tree</h1>
 
 <div class="nette-inner">
-
-<table style="width: 100%;">
-	<thead>
-		<tr>
-			<th rowspan="2">Links</th>
-			<th colspan="2">Arguments</th>
-		</tr>
-		<tr>
-			<th>Required</th>
-			<th>Optional</th>
-		</tr>
-	</thead>
-	<tbody>
-		<?php foreach ($links as $label => $link): ?>
+	<table style="width: 100%;">
+		<thead>
 			<tr>
-				<td>
-					<a href="<?php echo Environment::getVariable('baseUri') . '?' . http_build_query($link['location']) ?>"><?php echo $label?></a>
-				</td>
-				<td>
-					<?php $left = count($link['arguments']['required']) ?>
-					<?php foreach ($link['arguments']['required'] as $arg => $value): ?>
-						<span>
-							$<?php echo $arg ?>
-						</span>
-						<?php
-						if ($left != 1) {
-							echo ',';
-							$left--;
-						} ?>
-					<?php endforeach; ?>
-				</td>
-				<td>
-					<?php $left = count($link['arguments']['optional']) ?>
-					<?php foreach ($link['arguments']['optional'] as $arg => $value): ?>
-						<span>
-							$<?php echo $arg ?>
-						</span>
-						&nbsp;=&nbsp;
-						<span style="color: #408045; font-style: italic !important;">
-							<?php
-							if ($value === TRUE) {
-								echo 'TRUE';
-							} elseif ($value === FALSE) {
-								echo 'FALSE';
-							} elseif ($value === NULL) {
-								echo 'NULL';
-							} elseif (is_string($value)) {
-								echo '\'' . $value . '\'';
-							} else {
-								print_r($value);
-							}
-							?>
-						</span>
-						<?php
-						if ($left != 1) {
-							echo ',';
-							$left--;
-						} ?>
-					<?php endforeach ?>
-				</td>
+				<th rowspan="2">Presenter</th>
+				<th rowspan="2">Action</th>
+				<th colspan="2">Arguments</th>
 			</tr>
-		<?php endforeach ?>
-	</tbody>
-</table>
-
+			<tr>
+				<th>Required</th>
+				<th>Optional</th>
+			</tr>
+		</thead>
+		<tbody>
+			<?php renderPresenter($tree) ?>
+		</tbody>
+	</table>
 </div>
+
+<?php
+function renderPresenter(array $array, $level = 1, $sub = 0)
+{
+	foreach ($array as $key_val => $value) {
+		$offset = '';
+		if (is_array($value) && !isset($value['__link'])){
+			echo '<tr>';
+			echo '<td rowspan="' . count($value) . '">' . $key_val . '</td>';
+			renderPresenter($value, $level + 1, 1);
+		}
+		else {
+			if ($sub != 1){
+				echo '<tr>';
+			}
+			echo '<td><a href="' . $value['__link'] . '">' . $key_val . '</a></td><td>' . formatRequiredArgs($value['__arguments']['required']) . '</td><td>' . formatOptionalArgs($value['__arguments']['optional']) . '</td>';
+			echo '</tr>';
+		}
+	}
+}
+
+function formatRequiredArgs($arguments)
+{
+	$output = '';
+	$left = count($arguments);
+	foreach ($arguments as $arg => $value) {
+		$output .= '<span>$' . $arg . '</span>';
+
+		$output .= '</span>';
+		if ($left != 1) {
+			$output .= ',&nbsp;';
+			$left--;
+		}
+	}
+	return $output;
+}
+
+function formatOptionalArgs($arguments)
+{
+	$output = '';
+	$left = count($arguments);
+	foreach ($arguments as $arg => $value) {
+		$output .= '<span>$' . $arg . '</span>&nbsp;=&nbsp;';
+		$output .= '<span style="color: #408045; font-style: italic !important;">';
+
+		if ($value === TRUE) {
+			$output .= 'TRUE';
+		} elseif ($value === FALSE) {
+			$output .= 'FALSE';
+		} elseif ($value === NULL) {
+			$output .= 'NULL';
+		} elseif (is_string($value)) {
+			$output .= '\'' . $value . '\'';
+		} else {
+			$output .= print_r($value, TRUE);
+		}
+
+		$output .= '</span>';
+		if ($left != 1) {
+			$output .= ',&nbsp;';
+			$left--;
+		}
+	}
+	return $output;
+}
+?>
