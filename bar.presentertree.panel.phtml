@@ -16,10 +16,11 @@ if (!function_exists('_netteRequestCb2')) {
 			<tr>
 				<th rowspan="2">Presenter</th>
 				<th rowspan="2">Action</th>
-				<th colspan="2">Arguments</th>
+				<th colspan="3">Arguments</th>
 			</tr>
 			<tr>
 				<th>Required</th>
+				<th>Persistent</th>
 				<th>Optional</th>
 			</tr>
 		</thead>
@@ -43,7 +44,7 @@ function renderPresenter(array $array, $level = 1, $sub = 0)
 			if ($sub != 1){
 				echo '<tr>';
 			}
-			echo '<td><a href="' . $value['__link'] . '">' . $key_val . '</a></td><td>' . formatRequiredArgs($value['__arguments']['required']) . '</td><td>' . formatOptionalArgs($value['__arguments']['optional']) . '</td>';
+			echo '<td><a href="' . $value['__link'] . '">' . $key_val . '</a></td><td>' . formatRequiredArgs($value['__arguments']['required']) . '</td><td>' . formatPersistentArgs($value['__arguments']['persistent']) . '</td><td>' . formatOptionalArgs($value['__arguments']['optional']) . '</td>';
 			echo '</tr>';
 		}
 	}
@@ -86,6 +87,20 @@ function formatOptionalArgs($arguments)
 		}
 
 		$output .= '</span>';
+		if ($left != 1) {
+			$output .= ',&nbsp;';
+			$left--;
+		}
+	}
+	return $output;
+}
+
+function formatPersistentArgs($arguments)
+{
+	$output = '';
+	$left = count($arguments);
+	foreach ($arguments as $reflection) {
+		$output .= '<span>$' . $reflection->name . '</span>';
 		if ($left != 1) {
 			$output .= ',&nbsp;';
 			$left--;

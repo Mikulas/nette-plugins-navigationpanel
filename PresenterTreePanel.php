@@ -88,6 +88,16 @@ class PresenterTreePanel extends Object implements IDebugPanel
 				preg_match('/(?:[A-z0-9]+?_)*([A-z0-9]+)Presenter/m', $reflection->getName(), $match);
 				$presenter = $match[1];
 				$link .= $presenter;
+
+				$persistent = array();
+				foreach ($reflection->getProperties() as $property) {
+					foreach (AnnotationsParser::getAll($property) as $annotation => $value) {
+						if ($annotation == 'persistent') {
+							$persistent[] = $property;
+						}
+					}
+				}
+
 				$actions = array();
 				foreach ($reflection->getMethods() as $action) {
 					if (preg_match('/^(action|render)(.*)$/m', $action->getName(), $name) && !in_array($name[2], $actions)) {
@@ -111,10 +121,12 @@ class PresenterTreePanel extends Object implements IDebugPanel
 							$actions[$action_name]['arguments']['optional'] = array();
 						}
 					}
+					$actions[$action_name]['arguments']['persistent'] = $persistent;
 				}
 				if (count($actions) == 0) {
 					$actions['Default']['arguments']['required'] = array();
 					$actions['Default']['arguments']['optional'] = array();
+					$actions['Default']['arguments']['persistent'] = array();
 				}
 				foreach ($actions as $action => $info) {
 					$label = ':' . $link . ':' . $action;
