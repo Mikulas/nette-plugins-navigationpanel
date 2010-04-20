@@ -77,10 +77,9 @@ class PresenterTreePanel extends Object implements IDebugPanel
 		$iterator = new RegexIterator(new RecursiveIteratorIterator(new RecursiveDirectoryIterator(APP_DIR)), '/Presenter\.(php|PHP)$/m', RecursiveRegexIterator::GET_MATCH);
 		foreach ($iterator as $path => $match) {
 			$fileinfo = pathinfo($path);
-			
-			$reflection = new ReflectionClass($fileinfo['filename']);
+			$reflection = new ReflectionClass($this->getClassNameFromPath($path));
 			if ($reflection->isInstantiable()) {
-				$modules = $this->getPresenterModules($reflection->name);
+				$modules = $this->getModulesFromName($reflection->name);
 				$link = '';
 				if ($modules !== FALSE) {
 					$link .= implode(':', $modules);
@@ -89,7 +88,6 @@ class PresenterTreePanel extends Object implements IDebugPanel
 				preg_match('/(?:[A-z0-9]+?_)*([A-z0-9]+)Presenter/m', $reflection->getName(), $match);
 				$presenter = $match[1];
 				$link .= $presenter;
-
 				$actions = array();
 				foreach ($reflection->getMethods() as $action) {
 					if (preg_match('/^(action|render)(.*)$/m', $action->getName(), $name) && !in_array($name[2], $actions)) {
@@ -119,7 +117,7 @@ class PresenterTreePanel extends Object implements IDebugPanel
 					$actions['Default']['arguments']['optional'] = array();
 				}
 				foreach ($actions as $action => $info) {
-					$label = $link . ':' . $action;
+					$label = ':' . $link . ':' . $action;
 
 					if (Environment::getApplication()->getPresenter() instanceof Presenter) {
 						$links[$label]['link'] = Environment::getApplication()->getPresenter()->link($label);
@@ -225,14 +223,33 @@ class PresenterTreePanel extends Object implements IDebugPanel
 	}
 
 
+
+	private function getClassNameFromPath($path)
+	{
+		$path = realpath($path);
+		preg_match('~((?:(?:\\\\|/)[^\\\\/]+Module)*)(?:\\\\|/)presenters~', $path, $modules);
+		if (!empty($modules[1])) {
+			$modules = explode('Module', $modules[1]);
+			unset($modules[count($modules) - 1]);
+			$modules = str_replace('\\', '', $modules);
+			$modules = str_replace('/', '', $modules);
+			$pathInfo = pathinfo($path);
+			return implode('_', $modules) . '_' . $pathInfo['filename'];
+		} else {
+			$pathInfo = pathinfo($path);
+			return $pathInfo['filename'];
+		}
+	}
+
+
 	
 	/**
-	 * @param string $filename
+	 * @param string $className
 	 * @return array|string all modules given presenter file is under
 	 */
-	private function getPresenterModules($filename)
+	private function getModulesFromName($className)
 	{
-		$modules = explode('_', $filename);
+		$modules = explode('_', $className);
 		if (count($modules) === 1) {
 			return false;
 		} else {
