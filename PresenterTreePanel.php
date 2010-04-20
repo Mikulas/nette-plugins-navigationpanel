@@ -35,7 +35,7 @@ class PresenterTreePanel extends Object implements IDebugPanel
 	 */
 	function getTab()
 	{
-		return Environment::getApplication()->getPresenter()->backlink();
+		return 'Presenters';
 	}
 
 
@@ -120,8 +120,8 @@ class PresenterTreePanel extends Object implements IDebugPanel
 						if (!$set_optional) {
 							$actions[$action_name]['arguments']['optional'] = array();
 						}
+						$actions[$action_name]['arguments']['persistent'] = $persistent;
 					}
-					$actions[$action_name]['arguments']['persistent'] = $persistent;
 				}
 				if (count($actions) == 0) {
 					$actions['Default']['arguments']['required'] = array();
