@@ -131,7 +131,6 @@ class PresenterTreePanel extends Object implements IDebugPanel
 					$label = $link . ':' . $action;
 
 					if (Environment::getApplication()->getPresenter() instanceof Presenter) {
-						d($label);
 						$links[$label]['link'] = Environment::getApplication()->getPresenter()->link($label);
 					} else {
 						$links[$label]['link'] = 'false';
