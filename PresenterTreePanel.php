@@ -2,7 +2,7 @@
 /**
  * PresenterTree panel for Nette 1.0+. Displays all presenters and their required and optional parameters.
  *
- * @author Mikuláš Dítě
+ * @author Mikul� D�t?
  * @license MIT
  */
 
@@ -73,18 +73,17 @@ class PresenterTreePanel extends Object implements IDebugPanel
 	private function generate()
 	{
 		$links = array();
-		
+
 		$iterator = new RegexIterator(new RecursiveIteratorIterator(new RecursiveDirectoryIterator(APP_DIR)), '/Presenter\.(php|PHP)$/m', RecursiveRegexIterator::GET_MATCH);
 		foreach ($iterator as $path => $match) {
 			$fileinfo = pathinfo($path);
 			$reflection = new ReflectionClass($this->getClassNameFromPath($path));
 			if ($reflection->isInstantiable()) {
 				$modules = $this->getModulesFromName($reflection->name);
-				$link = '';
+				$link = ':';
 				if ($modules !== FALSE) {
-					$link .= implode(':', $modules);
+					$link .= implode(':', $modules) . ':';
 				}
-				$link .= ':';
 				preg_match('/(?:[A-z0-9]+?_)*([A-z0-9]+)Presenter/m', $reflection->getName(), $match);
 				$presenter = $match[1];
 				$link .= $presenter;
@@ -120,8 +119,8 @@ class PresenterTreePanel extends Object implements IDebugPanel
 						if (!$set_optional) {
 							$actions[$action_name]['arguments']['optional'] = array();
 						}
-						$actions[$action_name]['arguments']['persistent'] = $persistent;
 					}
+					$actions[$action_name]['arguments']['persistent'] = $persistent;
 				}
 				if (count($actions) == 0) {
 					$actions['Default']['arguments']['required'] = array();
@@ -129,9 +128,10 @@ class PresenterTreePanel extends Object implements IDebugPanel
 					$actions['Default']['arguments']['persistent'] = array();
 				}
 				foreach ($actions as $action => $info) {
-					$label = ':' . $link . ':' . $action;
+					$label = $link . ':' . $action;
 
 					if (Environment::getApplication()->getPresenter() instanceof Presenter) {
+						d($label);
 						$links[$label]['link'] = Environment::getApplication()->getPresenter()->link($label);
 					} else {
 						$links[$label]['link'] = 'false';
@@ -254,7 +254,7 @@ class PresenterTreePanel extends Object implements IDebugPanel
 	}
 
 
-	
+
 	/**
 	 * @param string $className
 	 * @return array|string all modules given presenter file is under
