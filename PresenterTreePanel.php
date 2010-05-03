@@ -67,6 +67,16 @@ class PresenterTreePanel extends Object implements IDebugPanel
 
 
 	/**
+	 * Registeres panel to Debug bar
+	 */
+	static function register()
+	{
+		Debug::addPanel(new self);
+	}
+
+
+
+	/**
 	 * Iterates through all presenters and returns their actions with backlinks and arguments
 	 * @return array
 	 */
