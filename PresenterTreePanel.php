@@ -2,7 +2,7 @@
 /**
  * PresenterTree panel for Nette 1.0+. Displays all presenters and their required and optional parameters.
  *
- * @author Mikuláš Dít?
+ * @author Mikulï¿½ Dï¿½t?
  * @license MIT
  */
 
@@ -77,7 +77,11 @@ class PresenterTreePanel extends Object implements IDebugPanel
 		$iterator = new RegexIterator(new RecursiveIteratorIterator(new RecursiveDirectoryIterator(APP_DIR)), '/Presenter\.(php|PHP)$/m', RecursiveRegexIterator::GET_MATCH);
 		foreach ($iterator as $path => $match) {
 			$fileinfo = pathinfo($path);
-			$reflection = new ReflectionClass($this->getClassNameFromPath($path));
+			$classname = $this->getClassNameFromPath($path);
+			if ($classname === FALSE) {
+				continue;
+			}
+			$reflection = new ReflectionClass($classname);
 			if ($reflection->isInstantiable()) {
 				$modules = $this->getModulesFromName($reflection->name);
 				$link = ':';
@@ -119,8 +123,8 @@ class PresenterTreePanel extends Object implements IDebugPanel
 						if (!$set_optional) {
 							$actions[$action_name]['arguments']['optional'] = array();
 						}
+						$actions[$action_name]['arguments']['persistent'] = $persistent;
 					}
-					$actions[$action_name]['arguments']['persistent'] = $persistent;
 				}
 				if (count($actions) == 0) {
 					$actions['Default']['arguments']['required'] = array();
@@ -245,10 +249,12 @@ class PresenterTreePanel extends Object implements IDebugPanel
 			$modules = str_replace('\\', '', $modules);
 			$modules = str_replace('/', '', $modules);
 			$pathInfo = pathinfo($path);
-			return implode('_', $modules) . '_' . $pathInfo['filename'];
+			$classname = implode('_', $modules) . '_' . $pathInfo['filename'];
+			return class_exists($classname) ? $classname : FALSE;
 		} else {
 			$pathInfo = pathinfo($path);
-			return $pathInfo['filename'];
+			$classname = $pathInfo['filename'];
+			return class_exists($classname) ? $classname : FALSE;
 		}
 	}
 
