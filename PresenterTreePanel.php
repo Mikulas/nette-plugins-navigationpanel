@@ -6,10 +6,15 @@
  * @license MIT
  */
 
-/*
-use Nette\Templates\
-namespace Nette;
-*/
+namespace Panel;
+use \Nette\Debug;
+use \Nette\Environment;
+use \Nette\IDebugPanel;
+use \Nette\Object;
+use \Nette\Reflection\AnnotationsParser;
+use \Nette\Templates;
+use \Nette\Templates\Template;
+
 class PresenterTreePanel extends Object implements IDebugPanel
 {
 	/**
@@ -84,14 +89,14 @@ class PresenterTreePanel extends Object implements IDebugPanel
 	{
 		$links = array();
 
-		$iterator = new RegexIterator(new RecursiveIteratorIterator(new RecursiveDirectoryIterator(APP_DIR)), '/Presenter\.(php|PHP)$/m', RecursiveRegexIterator::GET_MATCH);
+		$iterator = new \RegexIterator(new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(APP_DIR)), '/Presenter\.(php|PHP)$/m', \RecursiveRegexIterator::GET_MATCH);
 		foreach ($iterator as $path => $match) {
 			$fileinfo = pathinfo($path);
 			$classname = $this->getClassNameFromPath($path);
 			if ($classname === FALSE) {
 				continue;
 			}
-			$reflection = new ReflectionClass($classname);
+			$reflection = new \ReflectionClass($classname);
 			if ($reflection->isInstantiable()) {
 				$modules = $this->getModulesFromName($reflection->name);
 				$link = ':';
