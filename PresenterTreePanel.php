@@ -2,18 +2,19 @@
 /**
  * PresenterTree panel for Nette 1.0+. Displays all presenters and their required and optional parameters.
  *
- * @author Mikul� D�t?
+ * @author Mikuláš Dítě
  * @license MIT
  */
 
 namespace Panel;
-use \Nette\Debug;
-use \Nette\Environment;
-use \Nette\IDebugPanel;
-use \Nette\Object;
-use \Nette\Reflection\AnnotationsParser;
-use \Nette\Templates;
-use \Nette\Templates\Template;
+
+use Nette\Debug;
+use Nette\Environment;
+use Nette\IDebugPanel;
+use Nette\Object;
+use Nette\Reflection\AnnotationsParser;
+use Nette\Templates;
+use Nette\Templates\Template;
 
 class PresenterTreePanel extends Object implements IDebugPanel
 {
@@ -28,7 +29,7 @@ class PresenterTreePanel extends Object implements IDebugPanel
 	public function __construct()
 	{
 		if (self::MODULES_DISABLED !== TRUE) {
-			throw new NotImplementedException();
+			throw new \NotImplementedException();
 		}
 	}
 
