@@ -14,7 +14,7 @@ use Nette\IDebugPanel;
 use Nette\Object;
 use Nette\Reflection\AnnotationsParser;
 use Nette\Templates;
-use Nette\Templates\Template;
+use Nette\Templates\FileTemplate;
 
 class PresenterTreePanel extends Object implements IDebugPanel
 {
@@ -53,7 +53,7 @@ class PresenterTreePanel extends Object implements IDebugPanel
 	function getPanel()
 	{
 		ob_start();
-		$template = new Template(dirname(__FILE__) . '/bar.presentertree.panel.phtml');
+		$template = new FileTemplate(dirname(__FILE__) . '/bar.presentertree.panel.phtml');
 		$template->tree = $this->generate();
 		$template->render();
 		return $cache['output'] = ob_get_clean();
