@@ -1,4 +1,4 @@
-NavigationPanel for Nette v.1.0+
+NavigationPanel for Nette 2.0
 
 Usage:
         \Panel\NavigationPanel::register();
