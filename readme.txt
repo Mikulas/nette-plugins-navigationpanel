@@ -1,7 +1,7 @@
-﻿PresenterTreePanel for Nette v.1.0+
+NavigationPanel for Nette v.1.0+
 
 Usage:
-        \Panel\PresenterTreePanel::register();
+        \Panel\NavigationPanel::register();
 
 License: MIT
 Author: Mikuláš Dítě

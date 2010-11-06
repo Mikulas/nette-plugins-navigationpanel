@@ -21,18 +21,21 @@ class NavigationPanel extends Object implements IDebugPanel
 {
 
     	/**
-	 * Renders HTML code for custom tab.
+	 * Renders HTML code for custom tab
+	 * IDebugPanel
 	 * @return void
 	 */
-	function getTab()
+	public function getTab()
 	{
-		return 'Navigation';
+		return '<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAaBJREFUeNqkUz1rAkEQnT0XK8FYCpLCNFYWISgi/oRA2vSSgAhWJgQsDEkvlv6EXFqrNGIhSEAQKwsbueLAwsIPRE+97Jtwx5moETIwDDM7++bN7Kwol8vXRBSmE2S73e74tm2bVCqV7u0Tpd1u7/jFYvFO22w2QKKr9wuu0Gq1qNPpuAofceRYlsW2VquxnU6nJFVQIOHt8oMTk8nkXupCCFqtVnwxm82ynUwmJNfrNQMMBgOKRCIH+9c0jWazGdXrdTdmGAZpoOVQbDQaNBwO6fPpgdAa/G63S/1+n3OWyyWFQiFXx+MxSUWLGUAzmQwjh59fGSCdTv96AcS9wjNA0NFDghnsA9C8DJrNJvf1qJ9xIvxer8fqZeAtJlVfLoBD+eVmRDhPpVJ/t+AwwBCPteAAqFfbBQADXAwEArw00WiUdF2nfD5PavN42pB4PM4WLJHv8/m+AebzuUD1WCzmouZyOa6YSCS8e88xMCgUClStVgEkpGmaEkvi9/uPfiTkLBYLtpVKha3aRCmCweCtQj4/8TdaP0ANpv8f+RJgAMs5a/v6pdj7AAAAAElFTkSuQmCC">' .
+			'Navigation';
 	}
 
 
 
 	/**
-	 * Renders HTML code for custom panel.
+	 * Renders HTML code for custom panel
+	 * IDebugPanel
 	 * @return void
 	 */
 	function getPanel()
@@ -48,7 +51,8 @@ class NavigationPanel extends Object implements IDebugPanel
 
 
 	/**
-	 * Returns panel ID.
+	 * Returns panel ID
+	 * IDebugPanel
 	 * @return string
 	 */
 	function getId()
@@ -59,7 +63,7 @@ class NavigationPanel extends Object implements IDebugPanel
 
 
 	/**
-	 * Registeres panel to Debug bar
+	 * Registers panel to Debug bar
 	 */
 	static function register()
 	{
