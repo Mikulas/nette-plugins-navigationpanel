@@ -68,13 +68,17 @@ class PresenterTreePanel extends Object implements IDebugPanel
 
 
 
+	/**
+	 * @return array
+	 */
 	private function getPresenters()
 	{
 		@SafeStream::register(); //intentionally @ (prevents multiple registration warning)
 
 		$tree = array();
+
 		foreach (Finder::findFiles('*Presenter.php')->from(APP_DIR) as $path => $file) {
-			$data = $this->parsePresenter($file);
+			$data = $this->processPresenter($file);
 			if ($data === FALSE) {
 				continue;
 			}
@@ -82,12 +86,33 @@ class PresenterTreePanel extends Object implements IDebugPanel
 			list($module, $presenter, $actions) = $data;
 			$tree[$module][$presenter] = $actions;
 		}
-		//de($tree);
+
+		foreach (Finder::findFiles('*.phtml')->from(APP_DIR) as $path => $file) {
+			$data = $this->processTemplate($file);
+			if ($data === FALSE) {
+				continue;
+			}
+
+			list($module, $presenter, $action) = $data;
+
+			if (!isset($tree[$module][$presenter])) {
+				$tree[$module][$presenter] = array();
+			}
+			if (array_search($action, $tree[$module][$presenter]) === FALSE) {
+				$tree[$module][$presenter][] = $action;
+			}
+		}
+		
+		$tree = $this->removeSystemPresenters($tree);
 		return $tree;
 	}
 
 
 
+	/**
+	 * @param array $array
+	 * @return int
+	 */
 	public static function getRowspan(array $array)
 	{
 		$size = 0;
@@ -100,9 +125,21 @@ class PresenterTreePanel extends Object implements IDebugPanel
 
 
 	/**
+	 * Removes presenters such as Error etc.
+	 * @param array $tree
+	 */
+	public function removeSystemPresenters($tree)
+	{
+		unset($tree[NULL]['Error']);
+		return $tree;
+	}
+
+
+
+	/**
 	 * @param \SplFileInfo $file
 	 */
-	private function parsePresenter($file)
+	private function processPresenter($file)
 	{
 		$stream = fopen("safe://" . $file->getRealPath(), 'r');
 		$content = fread($stream, filesize("safe://" . $file->getRealPath()));
@@ -125,5 +162,25 @@ class PresenterTreePanel extends Object implements IDebugPanel
 			}
 		}
 		return array($module, $presenter, $actions);
+	}
+
+
+
+	/**
+	 * @param \SplFileInfo $file
+	 */
+	public function processTemplate($file)
+	{
+		$match = String::match($file->getRealPath(), '~(?:(?P<module>[A-z0-9_-]+)Module)?/templates/(?P<presenter>[A-z0-9_-]+)/(?P<action>[A-z0-9_-]+)\.phtml$~m');
+
+		if (!$match) {
+			return FALSE;
+		}
+
+		$module = $match['module'];
+		$presenter = $match['presenter'];
+		$action = $match['action'];
+
+		return array($module, $presenter, $action);
 	}
 }
