@@ -1,4 +1,4 @@
-<h1>Presenter Tree</h1>
+<h1>Navigation</h1>
 
 <div class="nette-inner">
 	<table style="width: 100%;">
@@ -17,14 +17,14 @@
 					{foreach $actions as $action}
 						<tr>
 							{if $rowspan_module == 1}
-								{assign $rowspan_module = \Panel\PresenterTreePanel::getRowspan($presenters)}
+								{assign $rowspan_module = \Panel\NavigationPanel::getRowspan($presenters)}
 								<td rowspan="{$rowspan_module}">{$module}</td>
 							{else}
 								{assign $rowspan_module = $rowspan_module - 1}
 							{/if}
 
 							{if $rowspan_presenter == 1}
-								{assign $rowspan_presenter = \Panel\PresenterTreePanel::getRowspan($actions)}
+								{assign $rowspan_presenter = \Panel\NavigationPanel::getRowspan($actions)}
 								<td rowspan="{$rowspan_presenter}">
 									<a href="{=\Nette\Environment::getApplication()->getPresenter()->link($module ? ":$module:$presenter:" : ":$presenter:")}">
 										{$presenter}

@@ -1,6 +1,6 @@
 <?php
 /**
- * PresenterTree panel for Nette 1.0+. Displays all presenters and their required and optional parameters.
+ * NavigationPanel for Nette 2.0. Fast navigation for developers.
  *
  * @author Mikuláš Dítě
  * @license MIT
@@ -17,7 +17,7 @@ use Nette\SafeStream;
 use Nette\Templates\LatteFilter;
 
 
-class PresenterTreePanel extends Object implements IDebugPanel
+class NavigationPanel extends Object implements IDebugPanel
 {
 
     	/**
@@ -26,7 +26,7 @@ class PresenterTreePanel extends Object implements IDebugPanel
 	 */
 	function getTab()
 	{
-		return 'Presenters';
+		return 'Navigation';
 	}
 
 
@@ -38,7 +38,7 @@ class PresenterTreePanel extends Object implements IDebugPanel
 	function getPanel()
 	{
 		ob_start();
-		$template = new FileTemplate(dirname(__FILE__) . '/bar.presentertree.panel.phtml');
+		$template = new FileTemplate(dirname(__FILE__) . '/bar.navigation.panel.phtml');
 		$template->registerFilter(new LatteFilter());
 		$template->tree = $this->getPresenters();
 		$template->render();
