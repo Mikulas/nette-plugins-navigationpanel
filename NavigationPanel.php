@@ -41,7 +41,7 @@ class NavigationPanel extends Object implements IDebugPanel
 	function getPanel()
 	{
 		ob_start();
-		$template = new FileTemplate(dirname(__FILE__) . '/bar.navigation.panel.phtml');
+		$template = new FileTemplate(dirname(__FILE__) . '/bar.navigation.panel.latte');
 		$template->registerFilter(new LatteFilter());
 		$template->tree = $this->getPresenters();
 		$template->render();
