@@ -26,9 +26,15 @@
 							{if $rowspan_presenter == 1}
 								{assign $rowspan_presenter = \Panel\Navigation::getRowspan($actions)}
 								<td rowspan="{$rowspan_presenter}">
+									{if in_array('default', $actions)}
 									<a href="{=\Nette\Environment::getApplication()->getPresenter()->link($module ? ":$module:$presenter:" : ":$presenter:")}">
 										{$presenter}
 									</a>
+									{else}
+									<a href="{=\Nette\Environment::getApplication()->getPresenter()->link($module ? ":$module:$presenter:$action" : ":$presenter:$action")}">
+										{$presenter}
+									</a>
+									{/if}
 								</td>
 							{else}
 								{assign $rowspan_presenter = $rowspan_presenter - 1}
