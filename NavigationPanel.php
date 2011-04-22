@@ -7,17 +7,18 @@
  */
 
 namespace Panel;
+
 use Nette\Object;
-use Nette\IDebugPanel;
-use Nette\Debug;
-use Nette\Templates\FileTemplate;
-use Nette\Finder;
-use Nette\String;
-use Nette\SafeStream;
-use Nette\Templates\LatteFilter;
+use Nette\Diagnostics\IBarPanel;
+use Nette\Diagnostics\Debugger;
+use Nette\Templating\FileTemplate;
+use Nette\Utils\Finder;
+use Nette\Utils\Strings as String;
+use Nette\Utils\SafeStream;
+use Nette\Latte\Engine;
 
 
-class NavigationPanel extends Object implements IDebugPanel
+class Navigation extends Object implements IBarPanel
 {
 
     	/**
@@ -42,7 +43,7 @@ class NavigationPanel extends Object implements IDebugPanel
 	{
 		ob_start();
 		$template = new FileTemplate(dirname(__FILE__) . '/bar.navigation.panel.latte');
-		$template->registerFilter(new LatteFilter());
+		$template->registerFilter(new Engine());
 		$template->tree = $this->getPresenters();
 		$template->render();
 		return $cache['output'] = ob_get_clean();
@@ -67,7 +68,7 @@ class NavigationPanel extends Object implements IDebugPanel
 	 */
 	static function register()
 	{
-		Debug::addPanel(new self);
+		Debugger::addPanel(new self);
 	}
 
 
@@ -75,12 +76,12 @@ class NavigationPanel extends Object implements IDebugPanel
 	/**
 	 * @return array
 	 */
-	private function getPresenters()
+public function getPresenters()
 	{
 		@SafeStream::register(); //intentionally @ (prevents multiple registration warning)
 
 		$tree = array();
-
+		
 		foreach (Finder::findFiles('*Presenter.php')->from(APP_DIR) as $path => $file) {
 			$data = $this->processPresenter($file);
 			if ($data === FALSE) {

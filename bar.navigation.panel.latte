@@ -17,14 +17,14 @@
 					{foreach $actions as $action}
 						<tr>
 							{if $rowspan_module == 1}
-								{assign $rowspan_module = \Panel\NavigationPanel::getRowspan($presenters)}
+								{assign $rowspan_module = \Panel\Navigation::getRowspan($presenters)}
 								<td rowspan="{$rowspan_module}">{$module}</td>
 							{else}
 								{assign $rowspan_module = $rowspan_module - 1}
 							{/if}
 
 							{if $rowspan_presenter == 1}
-								{assign $rowspan_presenter = \Panel\NavigationPanel::getRowspan($actions)}
+								{assign $rowspan_presenter = \Panel\Navigation::getRowspan($actions)}
 								<td rowspan="{$rowspan_presenter}">
 									<a href="{=\Nette\Environment::getApplication()->getPresenter()->link($module ? ":$module:$presenter:" : ":$presenter:")}">
 										{$presenter}
