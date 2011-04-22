@@ -76,7 +76,7 @@ class Navigation extends Object implements IBarPanel
 	/**
 	 * @return array
 	 */
-public function getPresenters()
+	private function getPresenters()
 	{
 		@SafeStream::register(); //intentionally @ (prevents multiple registration warning)
 
@@ -92,7 +92,7 @@ public function getPresenters()
 			$tree[$module][$presenter] = $actions;
 		}
 
-		foreach (Finder::findFiles('*.phtml')->from(APP_DIR) as $path => $file) {
+		foreach (Finder::findFiles('*.latte', '*.phtml')->from(APP_DIR) as $path => $file) {
 			$data = $this->processTemplate($file);
 			if ($data === FALSE) {
 				continue;
@@ -176,7 +176,7 @@ public function getPresenters()
 	 */
 	public function processTemplate($file)
 	{
-		$match = String::match($file->getRealPath(), '~(?:(?P<module>[A-z0-9_-]+)Module)?/templates/(?P<presenter>[A-z0-9_-]+)/(?P<action>[A-z0-9_-]+)\.phtml$~m');
+		$match = String::match($file->getRealPath(), '~(?:(?P<module>[A-z0-9_-]+)Module)?/templates/(?P<presenter>[A-z0-9_-]+)/(?P<action>[A-z0-9_-]+)\.(latte|phtml)$~m');
 
 		if (!$match) {
 			return FALSE;
