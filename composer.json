@@ -1,0 +1,12 @@
+{
+	"name": "Mikulas/nette-plugins-navigationpanel",
+	"description": "NavigationPanel for Nette 2.0 (Author: Mikuláš Dítě)",
+	"keywords": ["nette", "debugging", "navigation"],
+	"require": {
+		"php": ">= 5.3.0",
+		"nette/nette": "2.0.*"
+	},
+	"autoload": {
+        	"classmap": ["NavigationPanel.php"]
+	}
+}
