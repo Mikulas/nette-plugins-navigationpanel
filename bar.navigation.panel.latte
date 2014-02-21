@@ -10,21 +10,21 @@
 			</tr>
 		</thead>
 		<tbody>
-			{assign $rowspan_module = 1}
-			{assign $rowspan_presenter = 1}
+			{var $rowspan_module = 1}
+			{var $rowspan_presenter = 1}
 			{foreach $tree as $module => $presenters}
 				{foreach $presenters as $presenter => $actions}
 					{foreach $actions as $action}
 						<tr>
 							{if $rowspan_module == 1}
-								{assign $rowspan_module = \Panel\Navigation::getRowspan($presenters)}
+								{var $rowspan_module = \Panel\Navigation::getRowspan($presenters)}
 								<td rowspan="{$rowspan_module}">{$module}</td>
 							{else}
-								{assign $rowspan_module = $rowspan_module - 1}
+								{var $rowspan_module = $rowspan_module - 1}
 							{/if}
 
 							{if $rowspan_presenter == 1}
-								{assign $rowspan_presenter = \Panel\Navigation::getRowspan($actions)}
+								{var $rowspan_presenter = \Panel\Navigation::getRowspan($actions)}
 								<td rowspan="{$rowspan_presenter}">
 									{if in_array('default', $actions)}
 									<a href="{=\Nette\Environment::getApplication()->getPresenter()->link($module ? ":$module:$presenter:" : ":$presenter:")}">
@@ -37,7 +37,7 @@
 									{/if}
 								</td>
 							{else}
-								{assign $rowspan_presenter = $rowspan_presenter - 1}
+								{var $rowspan_presenter = $rowspan_presenter - 1}
 							{/if}
 							
 							<td>
