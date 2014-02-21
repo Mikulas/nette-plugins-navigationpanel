@@ -12,7 +12,7 @@ h2. Installation
 * Put NavigationPanel.php and the template (bar.user.panel.latte) into a directory maintained by RobotLoader, ec. LIBS_DIR/Panels/NavigationPanel. Make sure you keep these files together, in the same folder.
 * In BasePresenter.php (or similar) register the panel
     
-    \Panel\NavigationPanel::register();
+    \Panel\NavigationPanel::register($this->presenter);
 
 h2. License - Original BSD
 
