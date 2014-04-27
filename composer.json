@@ -1,5 +1,5 @@
 {
-	"name": "Mikulas/nette-plugins-navigationpanel",
+	"name": "mikulas/nette-plugins-navigationpanel",
 	"description": "NavigationPanel for Nette 2.1 (Author: Mikuláš Dítě)",
 	"keywords": ["nette", "debugging", "navigation"],
 	"require": {
