@@ -147,7 +147,7 @@ class Navigation extends Object implements IBarPanel
         $module = String::match($content, '~(^|;)\s*namespace (?P<name>[A-z0-9_-]+)Module;~m');
         $module = $module['name'];
 
-        $presenter = String::match($content, '~(^|;)\s*class (?P<name>[A-z0-9_-]+)Presenter(\s|$)~m');
+        $presenter = String::match($content, '~(^|;)\s*(?:final\s*)?class (?P<name>[A-z0-9_-]+)Presenter(\s|$)~m');
         if ($presenter === NULL || $presenter['name'] === 'Error') {
             return FALSE;
         }
